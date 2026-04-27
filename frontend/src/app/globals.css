@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+@theme {
+  /* Custom Colors from Designer */
+  --color-inverse-primary: #c6c6c6;
+  --color-on-tertiary: #ffffff;
+  --color-on-error: #ffffff;
+  --color-on-secondary-fixed-variant: #3c4d00;
+  --color-primary-fixed: #e2e2e2;
+  --color-surface-dim: #dadada;
+  --color-tertiary: #000000;
+  --color-on-surface-variant: #4c4546;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  --color-tertiary-fixed-dim: #ffabf3;
+  --color-surface-variant: #e2e2e2;
+  --color-inverse-on-surface: #f1f1f1;
+  --color-on-surface: #1a1c1c;
+  --color-on-secondary-fixed: #161e00;
+  --color-surface-container-low: #f3f3f3;
+  --color-secondary-fixed-dim: #abd600;
+  --color-surface-tint: #5e5e5e;
+  --color-outline-variant: #cfc4c5;
+  --color-on-primary-container: #848484;
+  --color-inverse-surface: #2f3131;
+  --color-secondary: #506600;
+  --color-primary-fixed-dim: #c6c6c6;
+  --color-on-tertiary-container: #e800e8;
+  --color-on-secondary: #ffffff;
+  --color-surface-container-high: #e8e8e8;
+  --color-surface: #f9f9f9;
+  --color-tertiary-fixed: #ffd7f5;
+  --color-secondary-fixed: #c3f400;
+  --color-on-background: #1a1c1c;
+  --color-on-tertiary-fixed-variant: #810081;
+  --color-error: #ba1a1a;
+  --color-on-primary-fixed-variant: #474747;
+  --color-secondary-container: #c1f100;
+  --color-on-primary: #ffffff;
+  --color-surface-bright: #f9f9f9;
+  --color-primary: #000000;
+  --color-surface-container-highest: #e2e2e2;
+  --color-on-secondary-container: #546b00;
+  --color-outline: #7e7576;
+  --color-tertiary-container: #380038;
+  --color-surface-container-lowest: #ffffff;
+  --color-background: #f9f9f9;
+  --color-on-primary-fixed: #1b1b1b;
+  --color-primary-container: #1b1b1b;
+  --color-on-tertiary-fixed: #380038;
+  --color-surface-container: #eeeeee;
+
+  /* Custom Fonts */
+  --font-h3: var(--font-space-grotesk), sans-serif;
+  --font-body-md: var(--font-inter), sans-serif;
+  --font-code: var(--font-space-grotesk), monospace;
+  --font-body-lg: var(--font-inter), sans-serif;
+  --font-h1: var(--font-space-grotesk), sans-serif;
+  --font-h2: var(--font-space-grotesk), sans-serif;
+  --font-label-bold: var(--font-space-grotesk), sans-serif;
+}
+
+/* Custom Brutalist Classes */
+.brutalist-shadow {
+  box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 1);
+}
+.brutalist-shadow-sm {
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+}
+.brutalist-shadow-neon {
+  box-shadow: 4px 4px 0px 0px #c1f100;
+}
+.glass-panel {
+  background-color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+body {
+  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCUhmY75qqHtz7VdbXEp21qjtkBX8WVL-yYKfaLbTg7Cn5LhGBh78iEJmZa5zzL_56XHqDKYx_M5AA-Il-fnZG6TxMBoi0lh7ETKZS01E9DktB9QBBj2bCZha_U3JYYmcL2zcvbks7KDsUpFT6pOOImkSOgXZiH2dMlfkFpPuP6y9GkU74sbyTq8SoZyRET4W8OOr8ykeFdr5N3ujL3mKXPvKLDdhOcJFloyJnA93qL5MbErADewgM-mpYGJonNGpX3_4H4_xUPqzIi');
+  background-size: cover;
+  background-attachment: fixed;
+  background-blend-mode: overlay;
+  background-color: rgba(255, 255, 255, 0.95);
+  color: var(--color-on-surface);
+  font-family: var(--font-body-md);
+}
+
+/* Marquee Hover Effect */
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.marquee-content {
+  display: inline-block;
+  min-width: 100%;
+}
+
+.marquee-container:hover .marquee-content {
+  animation: marquee 5s linear infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+.brutalist-shadow-error {
+  box-shadow: 4px 4px 0px 0px #ba1a1a;
+}
