@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#ffabf3",
+                    "on-error": "#ffffff",
+                    "inverse-on-surface": "#f1f1f1",
+                    "surface": "#f9f9f9",
+                    "on-primary-fixed": "#1b1b1b",
+                    "on-primary-container": "#848484",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed": "#161e00",
+                    "on-background": "#1a1c1c",
+                    "surface-container": "#eeeeee",
+                    "tertiary-container": "#380038",
+                    "secondary-fixed-dim": "#abd600",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed": "#ffd7f5",
+                    "outline": "#7e7576",
+                    "inverse-surface": "#2f3131",
+                    "tertiary": "#000000",
+                    "background": "#f9f9f9",
+                    "primary-fixed-dim": "#c6c6c6",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#cfc4c5",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed": "#380038",
+                    "primary-fixed": "#e2e2e2",
+                    "on-secondary-container": "#546b00",
+                    "on-tertiary-container": "#e800e8",
+                    "surface-dim": "#dadada",
+                    "secondary": "#506600",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed-variant": "#3c4d00",
+                    "surface-container-low": "#f3f3f3",
+                    "on-surface-variant": "#4c4546",
+                    "surface-container-highest": "#e2e2e2",
+                    "surface-variant": "#e2e2e2",
+                    "secondary-container": "#c1f100",
+                    "surface-container-high": "#e8e8e8",
+                    "primary-container": "#1b1b1b",
+                    "on-primary-fixed-variant": "#474747",
+                    "on-primary": "#ffffff",
+                    "primary": "#000000",
+                    "surface-tint": "#5e5e5e",
+                    "on-tertiary-fixed-variant": "#810081",
+                    "secondary-fixed": "#c3f400",
+                    "on-surface": "#1a1c1c",
+                    "inverse-primary": "#c6c6c6",
+                    "surface-bright": "#f9f9f9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "gutter": "24px",
+                    "sm": "8px",
+                    "xl": "48px",
+                    "md": "16px",
+                    "margin": "32px",
+                    "unit": "4px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "label-bold": ["Space Grotesk"],
+                    "body-md": ["Inter"],
+                    "code": ["Space Grotesk"],
+                    "body-lg": ["Inter"],
+                    "h1": ["Space Grotesk"],
+                    "h3": ["Space Grotesk"],
+                    "h2": ["Space Grotesk"]
+            },
+            "fontSize": {
+                    "label-bold": ["14px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                    "code": ["14px", {"lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                    "h1": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "h3": ["24px", {"lineHeight": "1.2", "letterSpacing": "0", "fontWeight": "600"}],
+                    "h2": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .brutalist-shadow { shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]; }
+        .glass-blur { backdrop-filter: blur(20px); }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface min-h-screen">
+<!-- SideNavBar -->
+<aside class="h-screen w-72 border-r-4 border-black fixed left-0 top-0 bg-white/60 backdrop-blur-[20px] shadow-[8px_0px_0px_0px_rgba(0,0,0,1)] flex flex-col h-full py-6 z-50">
+<div class="px-6 pb-6 mb-6 border-b-2 border-black">
+<div class="text-2xl font-black tracking-tighter text-black underline decoration-[4px] decoration-[#CCFF00]" style="">OBS_CORE</div>
+<div class="font-['Space_Grotesk'] font-bold uppercase tracking-wider text-xs opacity-60 mt-1" style="">V2.0.4-STABLE</div>
+</div>
+<nav class="flex-grow">
+<!-- Home (Active) -->
+<a class="bg-[#CCFF00] text-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-all font-label-bold" href="#" style="">
+<span class="material-symbols-outlined" data-icon="chat" style="">chat</span>
+                Home
+            </a>
+<!-- Execution -->
+<a class="text-black opacity-80 hover:opacity-100 hover:bg-[#00FFFF]/10 px-4 py-3 mx-2 my-1 flex items-center gap-3 hover:translate-x-1 transition-transform duration-100 font-label-bold" href="#" style="">
+<span class="material-symbols-outlined" data-icon="terminal" style="">terminal</span>
+                Execution
+            </a>
+<!-- Tasks & Agents -->
+<a class="text-black opacity-80 hover:opacity-100 hover:bg-[#00FFFF]/10 px-4 py-3 mx-2 my-1 flex items-center gap-3 hover:translate-x-1 transition-transform duration-100 font-label-bold" href="#" style="">
+<span class="material-symbols-outlined" data-icon="account_tree" style="">account_tree</span>
+                Tasks &amp; Agents
+            </a>
+<!-- System Logs -->
+<a class="text-black opacity-80 hover:opacity-100 hover:bg-[#00FFFF]/10 px-4 py-3 mx-2 my-1 flex items-center gap-3 hover:translate-x-1 transition-transform duration-100 font-label-bold" href="#" style="">
+<span class="material-symbols-outlined" data-icon="description" style="">description</span>
+                System Logs
+            </a>
+</nav>
+<div class="px-4 mt-auto">
+</div>
+</aside>
+<!-- TopAppBar -->
+<header class="fixed top-0 right-0 left-72 z-40 flex justify-between items-center px-8 h-20 bg-white/60 backdrop-blur-[20px] border-b-4 border-black shadow-[0px_4px_0px_0px_rgba(0,0,0,1)]">
+<div class="flex items-center gap-4">
+<h1 class="text-xl font-black italic text-black font-h3" style="">CYBER_OBSERVE</h1>
+<div class="h-6 w-px bg-black opacity-20"></div>
+<div class="flex items-center gap-2 px-3 py-1 bg-secondary-container border border-black text-[10px] font-bold uppercase tracking-widest" style="">
+<span class="w-2 h-2 rounded-full bg-black animate-pulse"></span>
+                System Live
+            </div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative">
+<input class="bg-white border-2 border-black py-2 px-4 w-64 font-code focus:shadow-[4px_4px_0px_0px_rgba(204,255,0,1)] outline-none transition-all" placeholder="SEARCH_QUERY..." type="text"/>
+</div>
+<div class="flex gap-4 border-l-2 border-black pl-6">
+<button class="hover:bg-[#CCFF00] hover:text-black transition-colors duration-150 p-1 active:scale-95" style="">
+<span class="material-symbols-outlined" data-icon="notifications_active" style="">notifications_active</span>
+</button>
+<button class="hover:bg-[#CCFF00] hover:text-black transition-colors duration-150 p-1 active:scale-95" style="">
+<span class="material-symbols-outlined" data-icon="settings" style="">settings</span>
+</button>
+<button class="hover:bg-[#CCFF00] hover:text-black transition-colors duration-150 p-1 active:scale-95" style="">
+<span class="material-symbols-outlined" data-icon="account_circle" style="">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="pl-72 pt-20 min-h-screen">
+<div class="p-margin max-w-7xl mx-auto">
+<!-- Hero Section: Chat Input -->
+<section class="mt-xl mb-xl">
+<div class="text-center mb-12">
+<h2 class="font-h1 text-primary mb-2 uppercase italic tracking-tighter" style="">Initiate Swarm Sequence</h2>
+<p class="font-body-lg text-on-surface-variant max-w-2xl mx-auto" style="">Define your objective and deploy specialized agents to solve complex technical bottlenecks.</p>
+</div>
+<div class="relative max-w-4xl mx-auto">
+<!-- Brutalist Chat Input -->
+<div class="bg-white/60 backdrop-blur-[20px] border-4 border-black p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] relative z-10">
+<div class="flex items-start gap-4 mb-4">
+<span class="material-symbols-outlined text-4xl" data-icon="terminal" style="">terminal</span>
+<textarea class="w-full h-32 bg-transparent border-none focus:ring-0 font-h3 placeholder:opacity-30 resize-none" placeholder="Type your Swarm Goal (e.g., 'Optimize the data pipeline for 4k stream processing' or 'Audit the security layer for CVE-2024-X')..."></textarea>
+</div>
+<div class="flex justify-between items-center pt-6 border-t-2 border-black">
+<div class="flex gap-4">
+<button class="flex items-center gap-2 px-4 py-2 border-2 border-black hover:bg-black hover:text-white transition-all font-label-bold uppercase text-xs" style="">
+<span class="material-symbols-outlined text-sm" data-icon="attach_file" style="">attach_file</span> Context
+                                </button>
+<button class="flex items-center gap-2 px-4 py-2 border-2 border-black hover:bg-black hover:text-white transition-all font-label-bold uppercase text-xs" style="">
+<span class="material-symbols-outlined text-sm" data-icon="memory" style="">memory</span> Memory
+                                </button>
+</div>
+<button class="bg-[#CCFF00] border-2 border-black px-8 py-3 font-label-bold uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" style="">
+                                Launch Swarm
+                            </button>
+</div>
+</div>
+<!-- Background Decoration -->
+<div class="absolute -top-4 -left-4 w-24 h-24 bg-[#00FFFF] -z-0 border-2 border-black"></div>
+<div class="absolute -bottom-4 -right-4 w-32 h-32 bg-[#FF00FF] -z-0 border-2 border-black opacity-20"></div>
+</div>
+</section>
+<!-- Grid Content -->
+<div class="grid grid-cols-12 gap-gutter items-start">
+<!-- Recent Executions (Left Column) -->
+<div class="col-span-12 lg:col-span-8">
+<div class="bg-white/60 backdrop-blur-[20px] border-4 border-black p-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+<div class="flex justify-between items-center mb-8 pb-4 border-b-2 border-black">
+<h3 class="font-h3 uppercase tracking-tight flex items-center gap-2" style="">
+<span class="material-symbols-outlined" data-icon="history" style="">history</span>
+                                Recent Executions
+                            </h3>
+<a class="font-label-bold text-xs uppercase underline underline-offset-4 hover:text-[#CCFF00] hover:bg-black px-2" href="#" style="">View All</a>
+</div>
+<div class="space-y-4">
+<!-- Execution Item 1 -->
+<div class="group flex items-center justify-between border-2 border-black p-4 bg-white hover:bg-secondary-container transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 border-2 border-black bg-[#CCFF00] flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="check_circle" style="">check_circle</span>
+</div>
+<div>
+<h4 class="font-label-bold uppercase text-sm" style="">Optimize Vector Database indexing</h4>
+<p class="font-code text-xs opacity-60" style="">RUN_ID: 982-AX-01 • 14 mins ago</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="text-right hidden sm:block">
+<p class="font-code text-xs font-bold" style="">12 AGENTS</p>
+<p class="font-code text-[10px] opacity-60" style="">SUCCESS</p>
+</div>
+<span class="material-symbols-outlined opacity-40 group-hover:opacity-100" data-icon="chevron_right" style="">chevron_right</span>
+</div>
+</div>
+<!-- Execution Item 2 -->
+<div class="group flex items-center justify-between border-2 border-black p-4 bg-white hover:bg-secondary-container transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 border-2 border-black bg-[#00FFFF] flex items-center justify-center">
+<span class="material-symbols-outlined animate-spin" data-icon="sync" style="">sync</span>
+</div>
+<div>
+<h4 class="font-label-bold uppercase text-sm" style="">Cross-Region Security Protocol Audit</h4>
+<p class="font-code text-xs opacity-60" style="">RUN_ID: 981-AX-42 • Active Now</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="text-right hidden sm:block">
+<p class="font-code text-xs font-bold" style="">08 AGENTS</p>
+<p class="font-code text-[10px] text-secondary" style="">PROCESSING...</p>
+</div>
+<span class="material-symbols-outlined opacity-40 group-hover:opacity-100" data-icon="chevron_right" style="">chevron_right</span>
+</div>
+</div>
+<!-- Execution Item 3 -->
+<div class="group flex items-center justify-between border-2 border-black p-4 bg-white hover:bg-secondary-container transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 border-2 border-black bg-[#FF00FF]/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-error" data-icon="error" style="">error</span>
+</div>
+<div>
+<h4 class="font-label-bold uppercase text-sm" style="">Auto-Scale Regression Test Cluster</h4>
+<p class="font-code text-xs opacity-60" style="">RUN_ID: 978-BC-11 • 2 hours ago</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="text-right hidden sm:block">
+<p class="font-code text-xs font-bold" style="">04 AGENTS</p>
+<p class="font-code text-[10px] text-error" style="">TERMINATED</p>
+</div>
+<span class="material-symbols-outlined opacity-40 group-hover:opacity-100" data-icon="chevron_right" style="">chevron_right</span>
+</div>
+</div>
+<!-- Execution Item 4 -->
+<div class="group flex items-center justify-between border-2 border-black p-4 bg-white hover:bg-secondary-container transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 border-2 border-black bg-[#CCFF00] flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="check_circle" style="">check_circle</span>
+</div>
+<div>
+<h4 class="font-label-bold uppercase text-sm" style="">Documentation Sync to Obsidian API</h4>
+<p class="font-code text-xs opacity-60" style="">RUN_ID: 975-FA-88 • 5 hours ago</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="text-right hidden sm:block">
+<p class="font-code text-xs font-bold" style="">01 AGENT</p>
+<p class="font-code text-[10px] opacity-60" style="">SUCCESS</p>
+</div>
+<span class="material-symbols-outlined opacity-40 group-hover:opacity-100" data-icon="chevron_right" style="">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- System Metrics (Right Column) -->
+<div class="col-span-12 lg:col-span-4 space-y-gutter">
+<!-- Agent Status Bento -->
+<div class="bg-white/60 backdrop-blur-[20px] border-4 border-black p-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+<h3 class="font-label-bold uppercase text-xs mb-6 tracking-widest opacity-60" style="">Active Swarm Metrics</h3>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between mb-2">
+<span class="font-code text-xs font-bold" style="">COGNITIVE LOAD</span>
+<span class="font-code text-xs" style="">78%</span>
+</div>
+<div class="w-full h-6 bg-surface border-2 border-black p-1">
+<div class="h-full bg-black" style="width: 78%"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="border-2 border-black p-3 text-center">
+<div class="font-h2 tracking-tighter" style="">42</div>
+<div class="text-[10px] font-bold uppercase opacity-60" style="">Active Agents</div>
+</div>
+<div class="border-2 border-black p-3 text-center bg-[#CCFF00]/10">
+<div class="font-h2 tracking-tighter" style="">0.3s</div>
+<div class="text-[10px] font-bold uppercase opacity-60" style="">Mean Latency</div>
+</div>
+</div>
+</div>
+</div>
+<!-- System Status Card -->
+<!-- Decorative Visual -->
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button (FAB) - Suppressed for focus on Home input -->
+<!-- Determined FAB suppression based on focus journey -->
+</body></html>

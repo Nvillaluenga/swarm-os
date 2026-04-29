@@ -16,6 +16,8 @@ The project features a Python backend for agent execution and a modern Next.js f
 - **Real-Time Dashboard**: A web interface that updates as the swarm executes tasks, providing full visibility.
 - **API Rate Limit Resilience**: Automatic exponential backoff retries for `429 RESOURCE_EXHAUSTED` errors.
 - **Brutalist Glass Design**: A high-impact, high-contrast UI design system with sharp edges and glassmorphic depth.
+- **System Logs Visualization**: Real-time log viewing with level and date-time range filtering.
+- **Agent Details Modal**: Interactive modal on the Executions page to view detailed agent definitions and tools.
 
 ## Getting Started
 

@@ -4,14 +4,14 @@
 
 This document outlines the design for **Swarm OS**. The goal of this framework is to move beyond static, hardcoded multi-agent systems and create a flexible environment where an AI "Architect" can dynamically spawn specialized agents, assign them specific tools, and orchestrate their work to achieve complex goals.
 
-This design incorporates feedback from the user, combining the Architect-Foreman concept with a Lead Agent, Sub-Agents, and a Critique Agent loop, as well as a pre-execution context check.
+This design incorporates feedback from the user, combining the Architect-Foreman concept with a Lead Agent, Sub-Agents, and a Critique Agent loop.
 
 ## 2. Philosophy
 
 The framework is built on a hybrid **Lead Agent / Architect-Foreman** philosophy with iterative critique.
 
 ### 2.1 Roles
-- **The Lead Agent (Architect)**: This is the strategist. It receives the user goal, checks if there is enough context, breaks down the task into smaller chunks, and **staffs the project** by defining the specific sub-agents needed (name, role, tools).
+- **The Lead Agent (Architect)**: This is the strategist. It receives the user goal, breaks down the task into smaller chunks, and **staffs the project** by defining the specific sub-agents needed (name, role, tools).
 - **The Foreman (Orchestrator)**: This is the execution engine. It receives the plan and the agent definitions from the Architect. It assigns tasks to the correct agents and manages the communication flow.
 - **Sub-Agents**: These are specialized workers created by the Architect to handle specific chunks of the task. They operate with a restricted set of tools.
 - **The Critique Agent**: This agent validates the completion of the plan. It reviews the output and either approves it or sends recommended changes back to the Lead Agent for replanning.
@@ -47,10 +47,7 @@ The framework follows a loop of Planning -> Execution -> Critique.
 ```mermaid
 graph TD
     User([User Goal]) --> LeadAgent[Lead Agent / Architect]
-    LeadAgent --> ContextCheck{Has Enough Context?}
-    ContextCheck -->|No| AskUser[Ask User Input]
-    AskUser --> LeadAgent
-    ContextCheck -->|Yes| Breakdown[1. Break down task into chunks]
+    LeadAgent --> Breakdown[1. Break down task into chunks]
     Breakdown --> Staffing[2. Staffs with Sub-Agents with skills]
     
     Staffing -->|Passes Agent Definitions & Plan| Foreman{Foreman Orchestrator}
@@ -95,17 +92,21 @@ A centralized system to register and describe tools. The Architect uses this to 
 ### 4.6 Output Folder (Workspace)
 - **Responsibilities**: A shared directory where agents can read and write files to share data and produce final results.
 
+### 4.7 Frontend Components
+- **LogToolbar**: Provides controls for filtering logs by level and date-time range, and downloading logs.
+- **LogTerminal**: A brutalist-styled terminal canvas for displaying real-time logs with auto-scroll functionality.
+- **Agents Modal**: A detailed view accessible from the Executions page, showing agent definitions and assigned tools.
+
 ---
 
 ## 5. Execution Flow
 
 1.  **Goal Reception**: User provides a goal (e.g., "I want a todo list app").
-2.  **Context Check**: Lead Agent verifies if it has enough info. If not, it asks the user.
-3.  **Planning & Staffing**: Lead Agent breaks down the task and generates definitions for Sub-Agent 1, Sub-Agent 2, etc., assigning them tools from the registry.
-4.  **Handoff**: Lead Agent passes the plan and agent definitions to the Foreman.
-5.  **Execution**: Foreman instantiates agents and assigns tasks. Sub-Agents execute and return answers.
-6.  **Critique**: Critique Agent validates the results.
-7.  **Loop or Done**: If valid, output is returned to user. If not, recommended changes go back to step 2/3.
+2.  **Planning & Staffing**: Lead Agent breaks down the task and generates definitions for Sub-Agent 1, Sub-Agent 2, etc., assigning them tools from the registry.
+3.  **Handoff**: Lead Agent passes the plan and agent definitions to the Foreman.
+4.  **Execution**: Foreman instantiates agents and assigns tasks. Sub-Agents execute and return answers.
+5.  **Critique**: Critique Agent validates the results.
+6.  **Loop or Done**: If valid, output is returned to user. If not, recommended changes go back to step 2.
 
 ---
 

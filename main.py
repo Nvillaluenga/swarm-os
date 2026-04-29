@@ -2,11 +2,12 @@ import os
 from models import Plan, Task
 from agent import Agent
 from tools import get_tool, list_tools
-from architect import check_context, generate_plan, load_env
+from architect import generate_plan, load_env
 from critique import critique_plan
 from typing import Dict
 import datetime
 import json
+import time
 
 LOG_FILE = "output/swarm.log"
 
@@ -18,7 +19,7 @@ def log_event(message: str):
         f.write(f"[{timestamp}] {message}\n")
     print(message)
 
-def save_summary(goal: str, plan: Plan, results: dict, valid: bool, feedback: str):
+def save_summary(goal: str, plan: Plan, results: dict, valid: bool, feedback: str, start_time: float):
     """Saves the run summary to summary.json in the session directory."""
     from tools import SESSION_DIR
     
@@ -28,7 +29,12 @@ def save_summary(goal: str, plan: Plan, results: dict, valid: bool, feedback: st
         "results": results,
         "valid": valid,
         "feedback": feedback,
-        "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "execution_stats": {
+            "total_duration": time.time() - start_time,
+            "active_nodes": len(plan.agents) if plan else 0,
+            "critical_errors": sum(1 for v in results.values() if str(v).startswith("Error:"))
+        }
     }
     
     summary_path = os.path.join(SESSION_DIR, "summary.json")
@@ -36,7 +42,7 @@ def save_summary(goal: str, plan: Plan, results: dict, valid: bool, feedback: st
         json.dump(summary, f, indent=2)
     log_event(f"Saved summary to {summary_path}")
 
-def run_foreman(goal: str, plan: Plan, initial_results: Dict[str, str] = None) -> Dict[str, str]:
+def run_foreman(goal: str, plan: Plan, start_time: float, initial_results: Dict[str, str] = None) -> Dict[str, str]:
     """Instantiates agents and executes tasks in the plan.
     
     Args:
@@ -97,7 +103,7 @@ def run_foreman(goal: str, plan: Plan, initial_results: Dict[str, str] = None) -
             results[task.id] = output
             
             # NEW: Save incremental summary after each task!
-            save_summary(goal, plan, results, valid=False, feedback="Running...")
+            save_summary(goal, plan, results, valid=False, feedback="Running...", start_time=start_time)
             
         except Exception as e:
             log_event(f"Task {task.id} failed: {e}")
@@ -109,13 +115,9 @@ def run_foreman(goal: str, plan: Plan, initial_results: Dict[str, str] = None) -
 def run_swarm(goal: str):
     """Runs the full swarm loop with replanning: Context Check -> [Planning -> Execution -> Critique] -> Done."""
     log_event(f"Starting Swarm with goal: {goal}")
+    start_time = time.time()
     
-    # 1. Context Check
-    if not check_context(goal):
-        log_event("Error: Goal does not have enough context. Please be more specific.")
-        return
-        
-    log_event("Context check passed.")
+
     
     # Loop variables
     max_iterations = 3
@@ -150,7 +152,7 @@ def run_swarm(goal: str):
         
         # 3. Execution
         # Pass accumulated results as initial context
-        new_results = run_foreman(goal, plan, initial_results=results)
+        new_results = run_foreman(goal, plan, start_time, initial_results=results)
         results.update(new_results) # Accumulate results
         
         # 4. Critique
@@ -161,7 +163,7 @@ def run_swarm(goal: str):
         log_event(f"Feedback: {feedback}")
         
         # Save final summary for this iteration
-        save_summary(goal, plan, results, valid, feedback)
+        save_summary(goal, plan, results, valid, feedback, start_time)
         
         if valid:
             log_event("\nGoal achieved successfully!")
@@ -177,10 +179,20 @@ if __name__ == "__main__":
     # Ensure env vars are loaded
     load_env()
     
-    # Generate unique session directory
+    import sys
     import uuid
-    timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    session_id = f"{timestamp}-{uuid.uuid4().hex[:8]}"
+    
+    if len(sys.argv) > 1:
+        goal = sys.argv[1]
+    else:
+        goal = "Write a file named 'hello.txt' with content 'Hello World'."
+        
+    if len(sys.argv) > 2:
+        session_id = sys.argv[2]
+    else:
+        timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        session_id = f"{timestamp}-{uuid.uuid4().hex[:8]}"
+        
     session_dir = f"output/{session_id}"
     
     from tools import set_session_dir
@@ -188,9 +200,4 @@ if __name__ == "__main__":
     
     log_event(f"Session Directory set to: {session_dir}")
     
-    # Simple goal for verification
-    complex_goal = (
-        "Write a file named 'hello.txt' with content 'Hello World'."
-    )
-    
-    run_swarm(complex_goal)
+    run_swarm(goal)

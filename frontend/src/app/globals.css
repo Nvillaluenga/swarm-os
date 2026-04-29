@@ -109,3 +109,16 @@ body {
 .brutalist-shadow-error {
   box-shadow: 4px 4px 0px 0px #ba1a1a;
 }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #000;
+  border: 2px solid #f1f1f1;
+}

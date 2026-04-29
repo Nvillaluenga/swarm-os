@@ -16,39 +16,7 @@ def load_env():
                     return True
     return False
 
-def check_context(goal: str) -> bool:
-    """Checks if the user goal has enough context to proceed.
-    
-    Args:
-        goal: The user's objective.
-        
-    Returns:
-        True if context is sufficient, False otherwise.
-    """
-    load_env()
-    client = genai.Client()
-    
-    prompt = f"""
-    You are the Lead Agent/Architect of a swarm.
-    Your task is to determine if the following user goal has enough context to be executed.
-    
-    User Goal: {goal}
-    
-    Reply with 'YES' if there is enough context to break it down into specific tasks and staff it with agents.
-    Reply with 'NO' if you need more information from the user.
-    
-    Provide only 'YES' or 'NO'.
-    """
-    
-    from utils import call_with_retry
-    response = call_with_retry(
-        client.models.generate_content,
-        model='gemini-3-flash-preview',
-        contents=prompt,
-    )
-    
-    result = response.text.strip().upper()
-    return "YES" in result
+
 
 def generate_plan(goal: str, available_tools: List[str]) -> Plan:
     """Generates a structured plan and staffing for the given goal.

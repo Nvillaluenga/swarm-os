@@ -9,7 +9,7 @@ export default function ExecutionOverview({ selectedRun }: ExecutionOverviewProp
   return (
     <Card 
       shadowColor={selectedRun.valid ? 'neon' : 'error'}
-      bgHue={selectedRun.valid ? 'default' : 'error'}
+      bgHue={selectedRun.valid ? 'success' : 'error'}
       className="w-full"
     >
       <div className="flex justify-between items-start z-10">
