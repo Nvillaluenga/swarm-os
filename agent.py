@@ -1,14 +1,15 @@
-from google import genai
 from google.genai import types
-from tools import Tool
-from typing import List
-
+from typing import List, Any
+from google.adk.agents import LlmAgent
+from google.adk.runners import InMemoryRunner
+from google.adk.tools import google_search
+import asyncio
+import os
 
 class Agent:
-    """Represents a worker agent in the swarm using Gemini 3 and native multi-tool support."""
+    """Represents a worker agent in the swarm using ADK LlmAgent."""
     
-
-    def __init__(self, name: str, role: str, tools: List[Tool]):
+    def __init__(self, name: str, role: str, tools: List[Any]):
         """Initializes the agent with a name, role, and tools.
         
         Args:
@@ -20,9 +21,6 @@ class Agent:
         self.role = role
         self.tools = tools
         
-        # Initialize the Gemini client
-        self.client = genai.Client()
-        
         # Construct the system instruction (persona)
         self.system_instruction = (
             f"You are {self.name}.\n"
@@ -30,21 +28,33 @@ class Agent:
             f"Always act according to your role."
         )
         
-        self.sdk_compatible_tools = [t.func if t.func else t for t in self.tools]
-        # Initialize in-memory chat session
-        # Using gemini-3-flash-preview as requested and verified
-        self.chat = self.client.chats.create(
+        # Map Tool objects to their underlying functions or native tools for the SDK
+        self.sdk_tools = []
+        self.code_executor = None
+        
+        for t in self.tools:
+            if t == "code_execution":
+                from google.adk.code_executors import BuiltInCodeExecutor
+                self.code_executor = BuiltInCodeExecutor()
+            else:
+                self.sdk_tools.append(t)
+                
+        # Initialize the ADK LlmAgent
+        self.llm_agent = LlmAgent(
+            name=self.name,
             model="gemini-3-flash-preview",
-            config=types.GenerateContentConfig(
-                system_instruction=self.system_instruction,
-                tools=self.sdk_compatible_tools,
-                # Enable combining built-in tools with function calling
+            instruction=self.system_instruction,
+            tools=self.sdk_tools,
+            code_executor=self.code_executor,
+            generate_content_config=types.GenerateContentConfig(
                 tool_config=types.ToolConfig(
                     include_server_side_tool_invocations=True
-                ),
-                temperature=0.2 # Lower temperature for deterministic tool use
+                )
             )
         )
+        
+        # Initialize the runner
+        self.runner = InMemoryRunner(agent=self.llm_agent)
 
     def execute(self, instruction: str, context: str = "") -> str:
         """Executes a task instruction with given context.
@@ -60,6 +70,24 @@ class Agent:
         if context:
             prompt += f"\nContext Data:\n{context}"
             
+        async def _run():
+            session = await self.runner.session_service.create_session(
+                app_name=self.runner.app_name, user_id="swarm_user"
+            )
+            content = types.UserContent(parts=[types.Part(text=prompt)])
+            response = ""
+            async for event in self.runner.run_async(
+                user_id=session.user_id,
+                session_id=session.id,
+                new_message=content,
+            ):
+                if event.content and event.content.parts and event.content.parts[0].text:
+                    response += event.content.parts[0].text
+            return response
+            
+        def _sync_run():
+            return asyncio.run(_run())
+            
         from utils import call_with_retry
-        response = call_with_retry(self.chat.send_message, prompt)
-        return response.text
+        return call_with_retry(_sync_run)
+

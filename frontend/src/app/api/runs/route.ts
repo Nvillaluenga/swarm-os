@@ -5,15 +5,15 @@ import { spawn } from 'child_process';
 
 export async function GET() {
   const outputDir = process.env.OUTPUT_DIR || path.join(process.cwd(), '..', 'output');
-  
+
   try {
     if (!fs.existsSync(outputDir)) {
       return NextResponse.json([]);
     }
-    
+
     const files = fs.readdirSync(outputDir);
     const runs = [];
-    
+
     for (const file of files) {
       const fullPath = path.join(outputDir, file);
       if (fs.statSync(fullPath).isDirectory()) {
@@ -38,7 +38,7 @@ export async function GET() {
         }
       }
     }
-    
+
     // Sort by timestamp descending, pushing 'Unknown' to the bottom
     runs.sort((a, b) => {
       if (a.timestamp === 'Unknown' && b.timestamp === 'Unknown') return 0;
@@ -46,7 +46,7 @@ export async function GET() {
       if (b.timestamp === 'Unknown') return -1;
       return b.timestamp.localeCompare(a.timestamp);
     });
-    
+
     return NextResponse.json(runs);
   } catch (error) {
     console.error('Failed to read output directory:', error);
@@ -56,49 +56,73 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const outputDir = process.env.OUTPUT_DIR || path.join(process.cwd(), '..', 'output');
-  
+
   try {
-    const formData = await request.formData();
-    const goal = formData.get('goal') as string;
-    const file = formData.get('file') as File | null;
-    
-    if (!goal) {
-      return NextResponse.json({ error: 'Goal is required' }, { status: 400 });
+    const contentType = request.headers.get('content-type');
+
+    let goal = '';
+    let file: File | null = null;
+    let sessionId = '';
+    let answers: any = null;
+
+    if (contentType?.includes('application/json')) {
+      const body = await request.json();
+      sessionId = body.sessionId;
+      answers = body.answers;
+
+      const sessionDir = path.join(outputDir, sessionId);
+      const summaryPath = path.join(sessionDir, 'summary.json');
+      if (fs.existsSync(summaryPath)) {
+        const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf-8'));
+        goal = summary.goal;
+      } else {
+        return NextResponse.json({ error: 'Session summary not found' }, { status: 400 });
+      }
+
+    } else {
+      const formData = await request.formData();
+      goal = formData.get('goal') as string;
+      file = formData.get('file') as File | null;
+
+      if (!goal) {
+        return NextResponse.json({ error: 'Goal is required' }, { status: 400 });
+      }
+
+      // Generate session ID for new run
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      const randomId = Math.random().toString(36).substring(2, 10);
+      sessionId = `${timestamp}-${randomId}`;
     }
-    
-    // Generate session ID
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-    const randomId = Math.random().toString(36).substring(2, 10);
-    const sessionId = `${timestamp}-${randomId}`;
+
     const sessionDir = path.join(outputDir, sessionId);
-    
+
     // Ensure directory exists
     fs.mkdirSync(sessionDir, { recursive: true });
-    
+
     // Handle file upload
     if (file) {
       const buffer = Buffer.from(await file.arrayBuffer());
       fs.writeFileSync(path.join(sessionDir, file.name), buffer);
     }
-    
+
     // Run swarm in background using the virtual environment python
     const out = fs.openSync(path.join(sessionDir, 'out.log'), 'a');
     const err = fs.openSync(path.join(sessionDir, 'err.log'), 'a');
-    
+
     const projectRoot = path.join(process.cwd(), '..');
     const pythonPath = path.join(projectRoot, '.venv', 'bin', 'python');
-    
+
     const pythonProcess = spawn(pythonPath, ['main.py', goal, sessionId], {
       cwd: projectRoot,
       detached: true,
       stdio: ['ignore', out, err]
     });
-    
+
     pythonProcess.unref();
-    
+
     return NextResponse.json({ success: true, id: sessionId });
   } catch (error) {
-    console.error('Failed to start run:', error);
-    return NextResponse.json({ error: 'Failed to start run' }, { status: 500 });
+    console.error('Failed to start or resume run:', error);
+    return NextResponse.json({ error: 'Failed to start or resume run' }, { status: 500 });
   }
 }

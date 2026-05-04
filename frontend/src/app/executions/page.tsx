@@ -19,6 +19,48 @@ function ExecutionsContent() {
   const [selectedRun, setSelectedRun] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState<string[]>([]);
+
+  const handleAnswerChange = (val: string) => {
+    const newAnswers = [...answers];
+    newAnswers[currentQuestionIndex] = val;
+    setAnswers(newAnswers);
+  };
+
+  const handleSubmitAnswers = async () => {
+    if (!selectedRun) return;
+    
+    const payload = {
+      sessionId: selectedRun.id,
+      answers: {} as any
+    };
+    
+    selectedRun.questions.forEach((q: string, index: number) => {
+      payload.answers[q] = answers[index] || '';
+    });
+    
+    try {
+      const res = await fetch('/api/runs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      const data = await res.json();
+      if (data.success) {
+        setAnswers([]);
+        setCurrentQuestionIndex(0);
+      } else {
+        alert('Failed to submit answers: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Error submitting answers:', error);
+      alert('Error submitting answers');
+    }
+  };
 
   const searchParams = useSearchParams();
   const runId = searchParams.get('runId');
@@ -54,7 +96,23 @@ function ExecutionsContent() {
     const intervalId = setInterval(() => {
       fetch('/api/runs')
         .then(res => res.json())
-        .then(data => setRuns(data))
+        .then(data => {
+          setRuns(prevRuns => {
+            const prevCompare = prevRuns.map(r => {
+              const { timestamp, ...rest } = r;
+              return rest;
+            });
+            const newCompare = data.map((r: any) => {
+              const { timestamp, ...rest } = r;
+              return rest;
+            });
+            
+            if (JSON.stringify(prevCompare) !== JSON.stringify(newCompare)) {
+              return data;
+            }
+            return prevRuns;
+          });
+        })
         .catch(err => console.error('Failed to poll runs:', err));
     }, 5000); // Poll runs every 5 seconds
 
@@ -79,7 +137,20 @@ function ExecutionsContent() {
       fetch(`/api/runs/${selectedRun.id}`)
         .then(res => res.json())
         .then(data => {
-          setSelectedRun({ ...data, id: selectedRun.id });
+          setSelectedRun(prevRun => {
+            const newData = { ...data, id: selectedRun.id };
+            
+            const prevCompare = { ...prevRun };
+            const newCompare = { ...newData };
+            
+            delete prevCompare.timestamp;
+            delete newCompare.timestamp;
+            
+            if (JSON.stringify(prevCompare) !== JSON.stringify(newCompare)) {
+              return newData;
+            }
+            return prevRun;
+          });
         })
         .catch(err => console.error(`Failed to poll details for ${selectedRun.id}:`, err));
     }, 3000); // Poll details every 3 seconds
@@ -152,6 +223,62 @@ function ExecutionsContent() {
 
               {/* Execution Overview Grid */}
               <div className="grid grid-cols-12 gap-6">
+                
+                {/* Questions Carousel Card (HITL) */}
+                {selectedRun?.questions && selectedRun.questions.length > 0 && (
+                  <div className="col-span-12 bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                    <div className="flex justify-between items-center mb-4 border-b-2 border-black pb-2">
+                      <h3 className="font-h3 text-h3 uppercase text-black">Human in the Loop</h3>
+                      <span className="font-code text-sm font-bold">
+                        Answered: {answers.filter(a => a && a.trim() !== '').length}/{selectedRun.questions.length}
+                      </span>
+                    </div>
+                    
+                    <div className="relative border-2 border-black p-4 bg-surface-container-low">
+                      <div className="mb-4">
+                        <span className="bg-black text-white px-2 py-0.5 text-[10px] font-bold uppercase">
+                          Question {currentQuestionIndex + 1}
+                        </span>
+                        <p className="mt-2 text-primary font-body">{selectedRun.questions[currentQuestionIndex]}</p>
+                      </div>
+                      
+                      <textarea
+                        className="w-full h-24 bg-white border-2 border-black p-2 font-body text-sm focus:outline-none focus:ring-2 focus:ring-lime-400"
+                        placeholder="Type your answer here..."
+                        value={answers[currentQuestionIndex] || ''}
+                        onChange={(e) => handleAnswerChange(e.target.value)}
+                      />
+                      
+                      <div className="flex justify-between mt-4">
+                        <button
+                          className="border-2 border-black px-4 py-1 font-label-bold uppercase text-xs hover:bg-black hover:text-white transition-colors disabled:opacity-50"
+                          onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
+                          disabled={currentQuestionIndex === 0}
+                        >
+                          Previous
+                        </button>
+                        
+                        {currentQuestionIndex === selectedRun.questions.length - 1 ? (
+                          <button
+                            className="bg-[#CCFF00] text-black border-2 border-black px-4 py-1 font-label-bold uppercase text-xs shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all disabled:opacity-50"
+                            onClick={handleSubmitAnswers}
+                            disabled={answers.filter(a => a && a.trim() !== '').length !== selectedRun.questions.length}
+                          >
+                            Submit & Continue
+                          </button>
+                        ) : (
+                          <button
+                            className="border-2 border-black px-4 py-1 font-label-bold uppercase text-xs hover:bg-black hover:text-white transition-colors"
+                            onClick={() => setCurrentQuestionIndex(prev => Math.min(selectedRun.questions.length - 1, prev + 1))}
+                          >
+                            Next
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Stats Bento */}
                 <div className="col-span-12 md:col-span-4 space-y-6">
                   <div 
@@ -220,7 +347,7 @@ function ExecutionsContent() {
                         </tr>
                       </thead>
                       <tbody className="divide-y-2 divide-black/5">
-                        {selectedRun.plan?.tasks.map((task: any) => {
+                        {selectedRun.plan?.tasks?.map((task: any) => {
                           const status = getTaskStatus(task.id, selectedRun.results);
                           return (
                             <tr key={task.id} className="hover:bg-[#CCFF00]/5 transition-colors">

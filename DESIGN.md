@@ -11,20 +11,28 @@ This design incorporates feedback from the user, combining the Architect-Foreman
 The framework is built on a hybrid **Lead Agent / Architect-Foreman** philosophy with iterative critique.
 
 ### 2.1 Roles
-- **The Lead Agent (Architect)**: This is the strategist. It receives the user goal, breaks down the task into smaller chunks, and **staffs the project** by defining the specific sub-agents needed (name, role, tools).
-- **The Foreman (Orchestrator)**: This is the execution engine. It receives the plan and the agent definitions from the Architect. It assigns tasks to the correct agents and manages the communication flow.
-- **Sub-Agents**: These are specialized workers created by the Architect to handle specific chunks of the task. They operate with a restricted set of tools.
-- **The Critique Agent**: This agent validates the completion of the plan. It reviews the output and either approves it or sends recommended changes back to the Lead Agent for replanning.
+- **The Lead Agent (Architect)**: Strategist that analyzes goals and generates the staffing plan.
+- **The Foreman Agent (Orchestrator)**: An intelligent `LlmAgent` from the ADK framework. It coordinates worker sub-agents not through fixed loops, but by intelligently calling them as subscribed **Agent Tools**.
+- **Sub-Agents**: Worker agents defined dynamically by the Architect, built as ADK `LlmAgent`s, and wrapped in `AgentTool` objects for the Foreman to leverage.
 
-### 2.2 Dynamic Swarms
-Instead of defining a fixed set of agents at startup, the swarm is fluid.
-- Agents are created **just-in-time** based on the specific requirements of the task.
-- Tools are assigned to agents dynamically by the Architect.
+### 2.3 Agent Creation & Assignment Responsibility
+- **Architect (Lead Agent) Responsibility**: The Architect continues to define the staffing plan (names, roles, tools).
+- **Foreman Responsibility**: The execution pipeline instantiates the worker sub-agents as ADK `LlmAgent`s, wraps them in `AgentTool`s, and initializes the **Foreman Agent** subscribing to these tools to fulfil the project tasks dynamically.
 
-### 2.3 Agent Creation & Assignment Responsibility [CLARIFIED]
-To avoid ambiguity, the responsibilities for dynamic agent management are divided as follows:
-- **Architect (Lead Agent) Responsibility**: The Architect is solely responsible for **defining** the agents. It determines the name, role (system instructions), and the list of tools for each sub-agent needed to complete the plan. It passes these definitions as data to the Foreman.
-- **Foreman Responsibility**: The Foreman is responsible for **instantiating** the agents. It takes the data definitions from the Architect, creates the actual agent instances in code, and routes the tasks to the appropriate agent instance. The Foreman does not decide *who* to create, only *how* to create and run them.
+---
+
+## 8. ADK Migration & Foreman Agent
+
+To modernize the multi-agent orchestration, Swarm OS uses the **Agent Development Kit (ADK)** framework. 
+
+### 8.1 Agent Definition via ADK
+Worker agents are declared as `google.adk.agents.LlmAgent` instances.
+
+### 8.2 Foreman Orchestration via Agent Tools
+Rather than enforcing a strict sequence of task execution in Python, the Foreman is modeled as a master `LlmAgent`. Sub-agents are subscribed to the Foreman using `google.adk.tools.agent_tool.AgentTool`. The Foreman evaluates the Architect's plan and the User Goal, dynamically invoking the sub-agent tools until the plan is fulfilled.
+
+### 8.3 Integration
+`main.py` interfaces with the ADK run pipeline to initiate execution. Log streaming and frontend observability seamlessly hook into the ADK lifecycle events.
 
 ### 2.4 Human-in-the-Loop (HITL) & Verification
 We recognize that LLM planning can be fallible. Therefore, the framework treats **Verification** and **Review** as first-class citizens. Execution can be paused for human approval of plans or critical actions, ensuring safety and correctness.
