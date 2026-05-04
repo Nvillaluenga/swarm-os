@@ -1,14 +1,18 @@
 import os
 from typing import Callable, Any, Dict, List
+from google.genai import types
 
-class Tool:
-    """Encapsulates a function that can be used as a tool by an agent."""
-    def __init__(self, name: str, description: str, func: Callable):
-        self.name = name
-        self.description = description
-        self.func = func
+class Tool(types.Tool):
+    """Encapsulates a function or native tool that can be used by an agent."""
+    name: str
+    description: str
+    func: Callable | None = None
 
-_REGISTRY: Dict[str, Tool] = {}
+_REGISTRY: Dict[str, Tool] = {
+    "google_search": Tool(name="google_search", description="Google Search", google_search=types.GoogleSearch()),
+    "code_execution": Tool(name="code_execution", description="Code Execution", code_execution=types.ToolCodeExecution()),
+    "url_context": Tool(name="url_context", description="URL Context", url_context=types.UrlContext()),
+}
 
 def register_tool(tool: Tool):
     """Registers a tool in the global registry."""
@@ -19,7 +23,7 @@ def get_tool(name: str) -> Tool:
     return _REGISTRY.get(name)
 
 def list_tools() -> List[Tool]:
-    """Lists all registered tools."""
+    """Lists all available tools (both registered and native)."""
     return list(_REGISTRY.values())
 
 def generate_tool_descriptions() -> str:
@@ -67,7 +71,14 @@ def read_file(filename: str) -> str:
     with open(path, "r") as f:
         return f.read()
 
-# Register default tools
+def request_user_input(prompt: str) -> str:
+    """Requests input from the human user.
+    
+    Args:
+        prompt: The question or prompt for the user.
+    """
+    return input(f"[Agent Request] {prompt}: ")
+
 register_tool(Tool(
     name="write_file",
     description="Writes content to a file in the output directory. Args: filename, content",
@@ -81,7 +92,15 @@ register_tool(Tool(
 ))
 
 register_tool(Tool(
-    name="google_search",
-    description="Performs a web search using Google. Useful for finding current information.",
-    func=None
+    name="request_user_input",
+    description="Requests input from the human user. Args: prompt",
+    func=request_user_input
 ))
+
+# To add a custom tool:
+# 1. Define a Python function with clear type hints and docstring.
+# 2. Create a Tool instance: `my_tool = Tool(name="my_name", description="...", func=my_func)`
+# 3. Call `register_tool(my_tool)`
+#
+# To add a new native GenAI tool:
+# Add it to the `_REGISTRY` dict above using the appropriate `types.Tool` keyword argument.

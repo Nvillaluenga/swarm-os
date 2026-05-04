@@ -62,13 +62,7 @@ def run_foreman(goal: str, plan: Plan, start_time: float, initial_results: Dict[
         log_event(f"Persona: {agent_def.role}")
         
         # Lookup tools by name in the registry
-        agent_tools = []
-        for tool_name in agent_def.tools:
-            t = get_tool(tool_name)
-            if t:
-                agent_tools.append(t)
-            else:
-                log_event(f"Warning: Tool '{tool_name}' not found in registry.")
+        agent_tools = [t for name in agent_def.tools if (t := get_tool(name))]
                 
         agents[agent_def.name] = Agent(
             name=agent_def.name,

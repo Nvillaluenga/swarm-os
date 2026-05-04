@@ -4,7 +4,7 @@ import path from 'path';
 import { spawn } from 'child_process';
 
 export async function GET() {
-  const outputDir = '/Users/nachov/Desktop/repos/swarm/output';
+  const outputDir = process.env.OUTPUT_DIR || path.join(process.cwd(), '..', 'output');
   
   try {
     if (!fs.existsSync(outputDir)) {
@@ -55,7 +55,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const outputDir = '/Users/nachov/Desktop/repos/swarm/output';
+  const outputDir = process.env.OUTPUT_DIR || path.join(process.cwd(), '..', 'output');
   
   try {
     const formData = await request.formData();
@@ -85,8 +85,11 @@ export async function POST(request: Request) {
     const out = fs.openSync(path.join(sessionDir, 'out.log'), 'a');
     const err = fs.openSync(path.join(sessionDir, 'err.log'), 'a');
     
-    const pythonProcess = spawn('/Users/nachov/Desktop/repos/swarm/.venv/bin/python', ['main.py', goal, sessionId], {
-      cwd: '/Users/nachov/Desktop/repos/swarm',
+    const projectRoot = path.join(process.cwd(), '..');
+    const pythonPath = path.join(projectRoot, '.venv', 'bin', 'python');
+    
+    const pythonProcess = spawn(pythonPath, ['main.py', goal, sessionId], {
+      cwd: projectRoot,
       detached: true,
       stdio: ['ignore', out, err]
     });

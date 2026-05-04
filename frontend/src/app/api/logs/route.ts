@@ -3,7 +3,8 @@ import fs from 'fs';
 import path from 'path';
 
 export async function GET() {
-  const logFilePath = '/Users/nachov/Desktop/repos/swarm/output/swarm.log';
+  const outputDir = process.env.OUTPUT_DIR || path.join(process.cwd(), '..', 'output');
+  const logFilePath = path.join(outputDir, 'swarm.log');
   
   try {
     if (!fs.existsSync(logFilePath)) {

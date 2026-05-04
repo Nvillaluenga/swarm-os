@@ -4,7 +4,7 @@ import path from 'path';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const outputDir = '/Users/nachov/Desktop/repos/swarm/output';
+  const outputDir = process.env.OUTPUT_DIR || path.join(process.cwd(), '..', 'output');
   const summaryPath = path.join(outputDir, id, 'summary.json');
   
   try {

@@ -3,9 +3,11 @@ from google.genai import types
 from tools import Tool
 from typing import List
 
+
 class Agent:
     """Represents a worker agent in the swarm using Gemini 3 and native multi-tool support."""
     
+
     def __init__(self, name: str, role: str, tools: List[Tool]):
         """Initializes the agent with a name, role, and tools.
         
@@ -28,21 +30,14 @@ class Agent:
             f"Always act according to your role."
         )
         
-        # Map Tool objects to their underlying functions or native tools for the SDK
-        self.sdk_tools = []
-        for t in self.tools:
-            if t.name == "google_search":
-                self.sdk_tools.append(types.Tool(google_search=types.GoogleSearch()))
-            else:
-                self.sdk_tools.append(t.func)
-                
+        self.sdk_compatible_tools = [t.func if t.func else t for t in self.tools]
         # Initialize in-memory chat session
         # Using gemini-3-flash-preview as requested and verified
         self.chat = self.client.chats.create(
             model="gemini-3-flash-preview",
             config=types.GenerateContentConfig(
                 system_instruction=self.system_instruction,
-                tools=self.sdk_tools,
+                tools=self.sdk_compatible_tools,
                 # Enable combining built-in tools with function calling
                 tool_config=types.ToolConfig(
                     include_server_side_tool_invocations=True
